@@ -35,7 +35,7 @@ export default function App() {
           ref={handleRef}
           maxLength={MAX_LENGTH}
           mediaUploader={uploader}
-          placeholder={{ focus: '分享美好时刻,输入 # 参与话题…', blur: '分享美好时刻…' }}
+          placeholder={{ focus: '  输入 # 参与话题…', blur: '输入 # 参与话题…' }}
           onChange={(html, _plain, len) => {
             setHtml(html)
             setLength(len)

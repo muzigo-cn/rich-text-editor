@@ -14,6 +14,11 @@
 - **字符长度计算**:`codePointAt` 步进算法正确处理 emoji 代理对
 - **原生能力解耦**:JSBridge/原生上传抽象为 `PlatformAdapter` / `MediaUploader` 可注入接口,默认纯 Web 实现
 
+## 在线演示
+
+- React demo:`https://rich-text-editor.739371512.workers.dev/`
+- Vue demo:`https://rich-text-editor.739371512.workers.dev/vue/`
+
 ## 技术栈
 
 - **核心**:`packages/core` —— 框架无关 vanilla TypeScript,基于 Selection/Range API
@@ -245,37 +250,6 @@ editor.setMediaStatus('f1', 'success', 'https://cdn.example.com/a.jpg')
 console.log(editor.getHTML(), editor.getLength())
 editor.destroy()
 ```
-
-## 在线演示
-
-Cloudflare Workers 静态资产托管(GitHub Actions 构建,push main 自动部署):
-
-- React demo:`https://rich-text-editor.<account>.workers.dev/`
-- Vue demo:`https://rich-text-editor.<account>.workers.dev/vue/`
-
-### 部署(Cloudflare Workers 静态资产)
-
-构建产物由 GitHub Actions([.github/workflows/ci.yml](.github/workflows/ci.yml))生成到 `out/`,经 [wrangler.jsonc](wrangler.jsonc) 以 Workers 静态资产模式上传。需在 GitHub 仓库 Settings → Secrets and variables → Actions 配置:
-
-| Secret | 说明 |
-|---|---|
-| `CLOUDFLARE_API_TOKEN` | API Token,模板 "Edit Cloudflare Workers" |
-| `CLOUDFLARE_ACCOUNT_ID` | 账号 ID,dashboard 右侧栏可复制 |
-
-本地手动部署:`pnpm exec wrangler deploy`(需 `CLOUDFLARE_API_TOKEN` 环境变量)。
-
-## 项目状态
-
-提取自 `superapp-omp-web`,按 4 阶段推进:
-
-- [x] **阶段 0**:Monorepo 脚手架(core/react/demo 三包,构建跑通)
-- [x] **阶段 1**:core 核心迁移(selection/length/topic/media 纯函数 + 事件流)
-- [x] **阶段 2**:React 适配层(useRichTextEditor hook + RichTextEditor 组件 + 上传态渲染)
-- [x] **阶段 2.5**:Vue 适配层(@rte/vue:useRichTextEditor composable + RichTextEditor 组件 + 上传态 Teleport 渲染)
-- [x] **阶段 3**:Demo 演示站(话题面板 + Web 上传,端到端演示)
-- [x] **阶段 4**:打磨发布(包发布配置 exports/sideEffects/peerDeps + 安装/API 文档)
-
-完整方案见 [docs/提取计划.md](./docs/提取计划.md)。
 
 ## License
 

@@ -42,7 +42,7 @@ const onFilesChange = (e: Event) => {
         ref="handle"
         :max-length="MAX_LENGTH"
         :media-uploader="uploader"
-        :placeholder="{ focus: '分享美好时刻,输入 # 参与话题…', blur: '分享美好时刻…' }"
+        :placeholder="{ focus: '  输入 # 参与话题…', blur: '输入 # 参与话题…' }"
         :on-change="(h, _plain, len) => { html = h; length = len }"
         :on-length-limit="over => (isOver = over)"
         :on-topic-trigger="() => (pickerOpen = true)"
