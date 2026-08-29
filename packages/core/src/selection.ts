@@ -51,7 +51,8 @@ export function resetRange(): void {
 }
 
 /**
- * 禁止选区部分选中话题 span:把边界落在话题节点内部的选区扩展为包含整节点
+ * 禁止选区部分选中话题 span:边界落在话题中间(非开头/末尾)时,扩展选区包裹整个话题
+ * 注意:getRangeAt 返回 live range,必须先判定再修改,否则边界在话题边界点时选区会被意外改写
  */
 export function deposeRangeStartAndEnd(): void {
   const selection = window.getSelection()
@@ -69,13 +70,15 @@ export function deposeRangeStartAndEnd(): void {
 
   if (!startContains && !endContains) return
 
-  if (startContains) range.setStartBefore(startNode)
-  if (endContains) range.setEndAfter(endNode)
+  // 仅边界位于话题中间时扩展;边界恰在话题开头/末尾视为边界点,保持不动
+  const expandStart = startContains && startOffset !== 0
+  const expandEnd = endContains && endOffset !== endNode.textContent?.length
+  if (!expandStart && !expandEnd) return
 
-  if ((startContains && startOffset !== 0) || (endContains && endOffset !== endNode.textContent?.length)) {
-    if (selection && selection.rangeCount) {
-      selection.removeAllRanges()
-      selection.addRange(range)
-    }
+  if (expandStart) range.setStartBefore(startNode!)
+  if (expandEnd) range.setEndAfter(endNode!)
+  if (selection && selection.rangeCount) {
+    selection.removeAllRanges()
+    selection.addRange(range)
   }
 }

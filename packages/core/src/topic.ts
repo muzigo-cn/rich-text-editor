@@ -1,5 +1,5 @@
 import type { EditorContext, TopicItem } from './types'
-import { DELETE_TOPIC_RANGE_DELAY, IOS_FOCUS_DELAY, NULL_CHAR_CLASS, TOPIC_CLASS, TOPIC_COLOR, ZW_SPAN_CLASS } from './constants'
+import { DELETE_TOPIC_RANGE_DELAY, IOS_FOCUS_DELAY, NULL_CHAR_CLASS, POINTER_UP_NORMALIZE_DELAY, SELECTION_STABLE_DELAY, TOPIC_CLASS, TOPIC_COLOR, ZW_SPAN_CLASS } from './constants'
 import { deposeRangeStartAndEnd, setSelection } from './selection'
 
 /**
@@ -145,19 +145,48 @@ export function insertTopic(ctx: EditorContext, topicItem: TopicItem, topicFrom:
 
 /**
  * selectionchange 统一处理:
- * 1. 光标在话题内 → 定位/补建零宽占位 span
- * 2. Android:话题→零宽 的选区规整为整节点
- * 3. 缓存选区
- * 4. iOS:禁止部分选中话题
+ * 1. 长按/拖选进行中(非收敛选区) → 完全走浏览器默认,选区稳定后统一规整话题边界
+ * 2. 光标在话题内(collapsed) → 按移动方向定位:向左移入停在话题开头,向右移入停在话题末尾(零宽占位)
+ * 3. Android:话题→零宽 的选区规整为整节点
+ * 4. 缓存选区
  */
 export function handleSelectionChange(ctx: EditorContext): void {
   const selection = window.getSelection()
 
+  // 长按/拖选手势进行中:任何改写都会打断手势,交由浏览器默认处理;
+  // 选区停止变化后,把落在话题中间的选区边界扩展为包裹整个话题
+  if (selection && selection.rangeCount !== 0 && !selection.isCollapsed) {
+    ctx.setCacheSelection()
+    scheduleTopicSelectionNormalize()
+    return
+  }
+
+  // 指针按下期间(单击定位/长按锚定):collapsed 光标不做定位改写,
+  // 否则方向定位会挪动手势锚点,导致从话题上开始的长按/拖选起始位置错误
+  if (!pointerDownActive) {
+    normalizeCollapsedCaret(ctx)
+  }
+
+  if (selection && selection.rangeCount !== 0) {
+    ctx.setCacheSelection()
+  }
+}
+
+/**
+ * collapsed 光标规整:话题内方向定位 + Android 选区节点化
+ */
+function normalizeCollapsedCaret(ctx: EditorContext): void {
+  const selection = window.getSelection()
+  if (!selection || selection.rangeCount === 0 || !selection.isCollapsed) return
+
   if (isInTopicSpan(selection)) {
     const topicSpan = selection?.focusNode?.parentElement as Element
     const nextNode = topicSpan?.nextElementSibling
-    if (nextNode?.className.includes(NULL_CHAR_CLASS)) {
-      // 已存在零宽节点:光标移入其中
+    if (shouldCaretAtTopicStart(ctx, topicSpan)) {
+      // 向左移入话题:光标停在话题开头,再次 Backspace 由 keydown 整体选中话题
+      setSelection(topicSpan, 0)
+    } else if (nextNode?.className.includes(NULL_CHAR_CLASS)) {
+      // 向右移入话题(或默认):光标移入话题后的零宽占位
       setSelection(nextNode, 1)
     } else {
       // 不存在:补建零宽占位 span
@@ -182,14 +211,61 @@ export function handleSelectionChange(ctx: EditorContext): void {
       }
     }
   }
+}
 
-  if (selection && selection.rangeCount !== 0) {
-    ctx.setCacheSelection()
+/** 指针按下状态(长按/拖选/单击手势期间为 true) */
+let pointerDownActive = false
+/** 指针抬起后的延迟规整定时器 */
+let pointerUpTimer: ReturnType<typeof setTimeout> | null = null
+
+/**
+ * 标记指针按下/抬起:
+ * 按下期间禁用 collapsed 光标定位,保护长按手势锚点;
+ * 抬起后延迟规整一次,覆盖"单击把光标放进话题内"的场景
+ */
+export function setPointerDown(ctx: EditorContext, active: boolean): void {
+  pointerDownActive = active
+  if (pointerUpTimer) {
+    clearTimeout(pointerUpTimer)
+    pointerUpTimer = null
   }
+  if (!active) {
+    pointerUpTimer = setTimeout(() => {
+      pointerUpTimer = null
+      normalizeCollapsedCaret(ctx)
+    }, POINTER_UP_NORMALIZE_DELAY)
+  }
+}
 
-  if (ctx.os === 'iOS') {
-    // 选区发生变化时的边界处理
+/** 编辑器销毁时清理指针状态 */
+export function clearPointerState(): void {
+  pointerDownActive = false
+  if (pointerUpTimer) {
+    clearTimeout(pointerUpTimer)
+    pointerUpTimer = null
+  }
+}
+
+/** 长按选区稳定检测定时器(手势期间每次 selectionchange 重置) */
+let topicNormalizeTimer: ReturnType<typeof setTimeout> | null = null
+
+/**
+ * 长按/拖选选区稳定后规整:把落在话题中间的选区边界扩展为包裹整个话题
+ * (deposeRangeStartAndEnd 仅在边界位于话题内部时改写,边界恰在话题开头/末尾时保持不动)
+ */
+function scheduleTopicSelectionNormalize(): void {
+  if (topicNormalizeTimer) clearTimeout(topicNormalizeTimer)
+  topicNormalizeTimer = setTimeout(() => {
+    topicNormalizeTimer = null
     deposeRangeStartAndEnd()
+  }, SELECTION_STABLE_DELAY)
+}
+
+/** 编辑器销毁时清理稳定检测定时器 */
+export function clearTopicSelectionNormalize(): void {
+  if (topicNormalizeTimer) {
+    clearTimeout(topicNormalizeTimer)
+    topicNormalizeTimer = null
   }
 }
 
@@ -199,4 +275,48 @@ export function handleSelectionChange(ctx: EditorContext): void {
 function isInTopicSpan(selection: Selection | null): boolean {
   const node = selection?.focusNode?.parentElement
   return node?.tagName === 'SPAN' && node.className.includes(TOPIC_CLASS)
+}
+
+/**
+ * 光标位于话题上时,Backspace 选中整个话题(含后置零宽占位),下一次删除整体移除
+ */
+export function selectTopicSpan(): void {
+  const selection = window.getSelection()
+  const focusNode = selection?.focusNode
+  if (!focusNode) return
+  // 光标所在话题 span:自身是话题 span,或其父节点是话题 span
+  const topicSpan = focusNode.nodeType === 1
+    ? ((focusNode as Element).className?.includes?.(TOPIC_CLASS) ? (focusNode as Element) : null)
+    : (focusNode.parentElement?.className.includes(TOPIC_CLASS) ? focusNode.parentElement : null)
+  if (!topicSpan) return
+
+  const endNode = topicSpan.nextElementSibling ?? topicSpan
+  const range = new Range()
+  range.setStart(topicSpan, 0)
+  range.setEnd(endNode, endNode === topicSpan ? topicSpan.childNodes.length : 1)
+  selection?.removeAllRanges()
+  selection?.addRange(range)
+}
+
+/**
+ * 光标是否位于话题上(话题 span 自身或其内部文本节点),供 Backspace 整体选中话题使用
+ */
+export function caretInTopicSpan(): boolean {
+  const focusNode = window.getSelection()?.focusNode
+  if (!focusNode) return false
+  if (focusNode.nodeType === 1) {
+    return !!(focusNode as Element).className?.includes?.(TOPIC_CLASS)
+  }
+  return !!focusNode.parentElement?.className.includes(TOPIC_CLASS)
+}
+
+/**
+ * 是否应把光标停在话题开头:
+ * 对比上一次缓存光标位置,话题位于旧光标之前说明用户自右向左移入话题
+ */
+function shouldCaretAtTopicStart(ctx: EditorContext, topicSpan: Element): boolean {
+  const prevFocus = ctx.cacheSelection?.focusNode
+  if (!prevFocus || prevFocus === topicSpan || topicSpan.contains(prevFocus)) return false
+  const position = prevFocus.compareDocumentPosition(topicSpan)
+  return !!(position & Node.DOCUMENT_POSITION_PRECEDING)
 }

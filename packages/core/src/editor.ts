@@ -3,7 +3,7 @@ import { DEFAULT_MAX_LENGTH, IMG_BOX_CLASS, NULL_CHAR_CLASS, PLACEHOLDER_CLASS, 
 import { webPlatform } from './platform'
 import { ImeState } from './ime'
 import { getCacheSelection, setSelection } from './selection'
-import { handleSelectionChange, insertTopic } from './topic'
+import { handleSelectionChange, insertTopic, selectTopicSpan, caretInTopicSpan, clearTopicSelectionNormalize, setPointerDown, clearPointerState } from './topic'
 import {
   appendDivZwBr,
   deleteDivZwBr,
@@ -95,8 +95,16 @@ export function createRichTextEditor(options: EditorOptions): RichTextEditor {
 
     ime.setKey(e.key)
     ctx.setCacheSelection()
-    // 媒体原子块删除保护
-    preventDefaultDelete(e, ctx.cacheSelection)
+
+    // 光标位于话题内:Backspace 不逐字删除,改为选中整个话题(下一次删除整体移除)
+    if (e.key === 'Backspace' && caretInTopicSpan()) {
+      e.preventDefault()
+      selectTopicSpan()
+      return
+    }
+
+    // 媒体原子块删除保护 + 整体删除
+    preventDefaultDelete(ctx, e)
   }
 
   const onFocus = () => {
@@ -127,12 +135,18 @@ export function createRichTextEditor(options: EditorOptions): RichTextEditor {
 
   const onSelectionChange = () => handleSelectionChange(ctx)
 
+  // 指针手势状态:按下期间禁用 collapsed 光标定位,保护长按/拖选的手势锚点
+  const onPointerDown = () => setPointerDown(ctx, true)
+  const onPointerUp = () => setPointerDown(ctx, false)
+
   root.addEventListener('input', onInput)
   root.addEventListener('keydown', onKeyDown)
   root.addEventListener('focus', onFocus)
   root.addEventListener('blur', onBlur)
   root.addEventListener('compositionstart', onCompositionStart)
   root.addEventListener('compositionend', onCompositionEnd)
+  root.addEventListener('pointerdown', onPointerDown)
+  root.addEventListener('pointerup', onPointerUp)
   document.addEventListener('selectionchange', onSelectionChange)
 
   return {
@@ -160,6 +174,10 @@ export function createRichTextEditor(options: EditorOptions): RichTextEditor {
       root.removeEventListener('compositionstart', onCompositionStart)
       root.removeEventListener('compositionend', onCompositionEnd)
       document.removeEventListener('selectionchange', onSelectionChange)
+      root.removeEventListener('pointerdown', onPointerDown)
+      root.removeEventListener('pointerup', onPointerUp)
+      clearTopicSelectionNormalize()
+      clearPointerState()
       root.classList.remove(ROOT_CLASS, PLACEHOLDER_CLASS)
       root.removeAttribute('contenteditable')
       root.removeAttribute('spellcheck')

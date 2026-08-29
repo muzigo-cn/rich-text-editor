@@ -23,3 +23,5 @@ export const MEDIA_MARGIN = '12px'
 export const DELETE_TOPIC_RANGE_DELAY = 20 // 删除到话题后选区重定向延迟
 export const REFRESH_DELAY = 200 // 媒体插入/占位后的异步刷新延迟
 export const IOS_FOCUS_DELAY = 700 // iOS 键盘从右侧出现的光标时序延迟
+export const SELECTION_STABLE_DELAY = 300 // 长按/拖选选区稳定判定阈值(连续 selectionchange 视为手势进行中)
+export const POINTER_UP_NORMALIZE_DELAY = 50 // 指针抬起后 collapsed 光标规整延迟(等浏览器完成选区设置)

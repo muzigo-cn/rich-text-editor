@@ -1,4 +1,4 @@
-import type { CustomSelection, EditorContext, MediaFile, MediaInsertInfo, MediaType, UploadStatus } from './types'
+import type { EditorContext, MediaFile, MediaInsertInfo, MediaType, UploadStatus } from './types'
 import { IMG_BOX_CLASS, IMG_CLASS, MEDIA_MARGIN, NULL_CHAR_CLASS, REFRESH_DELAY, VIDEO_CLASS, ZW_BR_CLASS } from './constants'
 import { setSelection } from './selection'
 
@@ -257,9 +257,11 @@ export const focusDivZwBrHandle = (node: Element): boolean => {
 }
 
 /**
- * 阻止 Backspace 删除媒体原子块(按缓存选区判断光标前是否为媒体)
+ * 阻止 Backspace 删除媒体原子块(按缓存选区判断光标前是否为媒体),
+ * 并执行整体删除:删除光标前紧邻的媒体容器后复位光标
  */
-export function preventDefaultDelete(e: KeyboardEvent, cacheSelection: CustomSelection | null): void {
+export function preventDefaultDelete(ctx: EditorContext, e: KeyboardEvent): void {
+  const cacheSelection = ctx.cacheSelection
   const cacheFocus = cacheSelection?.focusNode as Element | null
   if (!cacheFocus) return
 
@@ -282,7 +284,59 @@ export function preventDefaultDelete(e: KeyboardEvent, cacheSelection: CustomSel
 
   if (isDelete && isImgBoxPre && (isImgBoxPre1 || isImgBoxPre2 || isImgBoxPre3)) {
     e.preventDefault()
+    deleteMediaBoxBeforeCaret(ctx, cacheFocus)
   }
+}
+
+/**
+ * Backspace 删除媒体的实际执行:移除光标前紧邻的媒体容器,
+ * 全部媒体删除后清理尾部占位,并把光标复位到媒体原位置
+ */
+function deleteMediaBoxBeforeCaret(ctx: EditorContext, cacheFocus: Element): void {
+  const root = ctx.root
+
+  // 场景 1:光标所在占位容器内部包含媒体(insertDivZwBr 内部 [imgBox, br])
+  if (focusDivZwBrHandle(cacheFocus)) {
+    const imgBox = (cacheFocus.lastChild as Element | null)?.previousElementSibling as Element | null
+    if (imgBox) imgBox.remove()
+    if (!root.querySelector(`.${IMG_BOX_CLASS}`)) {
+      // 清理其它尾部占位;光标所在容器保留作为输入落点
+      Array.from(root.getElementsByClassName(ZW_BR_CLASS)).forEach((el) => {
+        if (el !== cacheFocus) el.remove()
+      })
+    }
+    setSelection(cacheFocus, 0)
+    ctx.refresh()
+    return
+  }
+
+  // 场景 2:前一个兄弟节点(跳过空文本)是媒体容器
+  let prev = cacheFocus.previousSibling as Element | null
+  while (prev?.nodeType === 3 && prev.textContent === '') {
+    prev = prev.previousSibling as Element | null
+  }
+  let imgBox: Element | null = prev?.className === IMG_BOX_CLASS ? prev : null
+
+  // 场景 3:前一个元素内部末尾是媒体容器
+  if (!imgBox) {
+    const last = cacheFocus.previousElementSibling?.lastElementChild as Element | null
+    if (last?.className === IMG_BOX_CLASS) imgBox = last
+  }
+  if (!imgBox) return
+
+  const prevNode = imgBox.previousSibling
+  imgBox.remove()
+  if (!root.querySelector(`.${IMG_BOX_CLASS}`)) {
+    Array.from(root.getElementsByClassName(ZW_BR_CLASS)).forEach((el) => el.remove())
+  }
+
+  // 光标复位:回到媒体原位置(优先前文本末尾,否则编辑器开头)
+  if (prevNode?.nodeType === 3 && (prevNode.textContent?.length ?? 0) > 0) {
+    setSelection(prevNode as Text, (prevNode as Text).length)
+  } else {
+    setSelection(root, 0)
+  }
+  ctx.refresh()
 }
 
 /**

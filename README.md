@@ -118,6 +118,13 @@ export interface EditorOptions {
 
 core 暴露 `createRichTextEditor(options)`,返回 `{ insertTopic, getHTML, getLength, focus, destroy }`。
 
+## 在线演示
+
+GitHub Pages 自动部署(push main 触发):
+
+- React demo:<https://muzigo-cn.github.io/rich-text-editor/>
+- Vue demo:<https://muzigo-cn.github.io/rich-text-editor/vue/>
+
 ## 项目状态
 
 提取自 `superapp-omp-web`,按 4 阶段推进:

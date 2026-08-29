@@ -1,5 +1,5 @@
 import type { ImeState } from './ime'
-export type OS = 'iOS' | 'Android' | 'Other'
+export type OS = 'iOS' | 'Android' | 'Other' | 'Web'
 
 export type UploadStatus = 'loading' | 'success' | 'failure'
 
