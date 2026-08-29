@@ -1,6 +1,6 @@
 {
   "name": "@fe-muzi/rte-vue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "@fe-muzi/rte-core 的 Vue 3 适配层:组件绑定 + 命令式 API + 上传状态渲染",
   "keywords": [
     "rich-text-editor",

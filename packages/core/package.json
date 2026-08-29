@@ -1,6 +1,6 @@
 {
   "name": "@fe-muzi/rte-core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "移动端富文本编辑器内核:话题(#)插入 + 图片/视频图文混排,框架无关,基于 contentEditable + Selection API",
   "keywords": [
     "rich-text-editor",
