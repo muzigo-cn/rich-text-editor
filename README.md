@@ -120,10 +120,24 @@ core 暴露 `createRichTextEditor(options)`,返回 `{ insertTopic, getHTML, getL
 
 ## 在线演示
 
-GitHub Pages 自动部署(push main 触发):
+Cloudflare Pages 自动部署(push main 触发):
 
-- React demo:<https://muzigo-cn.github.io/rich-text-editor/>
-- Vue demo:<https://muzigo-cn.github.io/rich-text-editor/vue/>
+- React demo:<https://rich-text-editor.pages.dev/>
+- Vue demo:<https://rich-text-editor.pages.dev/vue/>
+
+部署配置:Cloudflare Pages 连接 GitHub 仓库,构建命令与输出目录见下方「部署(Cloudflare Pages)」。
+
+### 部署(Cloudflare Pages)
+
+在 Cloudflare 控制台创建 Pages 项目并连接本仓库:
+
+| 配置项 | 值 |
+|---|---|
+| Production branch | `main` |
+| Framework preset | `None` |
+| Build command | `pnpm install --frozen-lockfile && pnpm -C apps/demo exec vite build --base=/ && pnpm -C apps/demo-vue exec vite build --base=/vue/ && mkdir -p out/vue && cp -r apps/demo/dist/* out/ && cp -r apps/demo-vue/dist/* out/vue/` |
+| Build output directory | `out` |
+| 环境变量 `NODE_VERSION` | `22` |
 
 ## 项目状态
 
