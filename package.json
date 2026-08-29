@@ -1,0 +1,17 @@
+{
+  "name": "rich-text-editor",
+  "private": true,
+  "version": "0.0.0",
+  "description": "移动端富文本编辑器(话题 + 图文混排),框架无关 core + React 适配层",
+  "license": "MIT",
+  "scripts": {
+    "dev": "pnpm -C apps/demo dev",
+    "build": "pnpm -r run build",
+    "build:core": "pnpm -C packages/core build",
+    "build:react": "pnpm -C packages/react build",
+    "typecheck": "pnpm -r run typecheck"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

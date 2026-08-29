@@ -1,0 +1,118 @@
+/* 主题变量(可覆盖) */
+:root {
+  --rte-text-primary: #000000;
+  --rte-text-disabled: #949598;
+  --rte-text-link: #2762ec;
+  --rte-placeholder-color: #949598;
+}
+
+/* 编辑器根节点 */
+.rte-root {
+  position: relative;
+  outline: none;
+  word-break: break-all;
+  white-space: pre-wrap;
+  user-select: text;
+  -webkit-user-select: text;
+}
+.rte-root * {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* span 样式治理:统一字号,非话题 span 使用主色 */
+.rte-root span {
+  font-size: 14px !important;
+}
+.rte-root span:not(.topicHightColor) {
+  color: var(--rte-text-primary) !important;
+}
+.rte-root .topicHightColor {
+  color: var(--rte-text-link) !important;
+}
+
+/* 话题后零宽占位(不可见) */
+.rte-root .nullCharacter1 {
+  font-size: 0;
+  min-width: 1px;
+}
+
+/* placeholder:focus/blur 两态由 data-placeholder 提供 */
+.rte-show-placeholder::before {
+  content: attr(data-placeholder);
+  white-space: pre;
+  color: var(--rte-placeholder-color);
+  position: absolute;
+  left: 13px;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* 媒体原子块 */
+.rte-root .insertImg,
+.rte-root .insertVideo {
+  display: flex;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.rte-root .insertImg img,
+.rte-root .insertVideo video {
+  width: 100%;
+  display: block;
+}
+.rte-root .insertImgBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 媒体后换行占位 */
+.rte-root .insertDivZwBr {
+  line-height: 1.2;
+}
+
+/* 上传态占位(react 适配层 portal 渲染) */
+.rte-upload-loading {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f8fa;
+  border-radius: 4px;
+}
+.rte-upload-loading.rte-upload-video {
+  min-height: 160px;
+}
+.rte-upload-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #d0d3d9;
+  border-top-color: var(--rte-text-link);
+  border-radius: 50%;
+  animation: rte-spin 0.8s linear infinite;
+}
+@keyframes rte-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.rte-upload-failure {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #f7f8fa;
+  color: var(--rte-placeholder-color);
+  font-size: 14px;
+  border-radius: 4px;
+}
+.rte-upload-failure-btn {
+  border: 1px solid #d0d3d9;
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 2px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
