@@ -120,24 +120,21 @@ core 暴露 `createRichTextEditor(options)`,返回 `{ insertTopic, getHTML, getL
 
 ## 在线演示
 
-Cloudflare Pages 自动部署(push main 触发):
+Cloudflare Workers 静态资产托管(GitHub Actions 构建,push main 自动部署):
 
-- React demo:<https://rich-text-editor.pages.dev/>
-- Vue demo:<https://rich-text-editor.pages.dev/vue/>
+- React demo:`https://rich-text-editor.<account>.workers.dev/`
+- Vue demo:`https://rich-text-editor.<account>.workers.dev/vue/`
 
-部署配置:Cloudflare Pages 连接 GitHub 仓库,构建命令与输出目录见下方「部署(Cloudflare Pages)」。
+### 部署(Cloudflare Workers 静态资产)
 
-### 部署(Cloudflare Pages)
+构建产物由 GitHub Actions([.github/workflows/ci.yml](.github/workflows/ci.yml))生成到 `out/`,经 [wrangler.jsonc](wrangler.jsonc) 以 Workers 静态资产模式上传。需在 GitHub 仓库 Settings → Secrets and variables → Actions 配置:
 
-在 Cloudflare 控制台创建 Pages 项目并连接本仓库:
-
-| 配置项 | 值 |
+| Secret | 说明 |
 |---|---|
-| Production branch | `main` |
-| Framework preset | `None` |
-| Build command | `pnpm install --frozen-lockfile && pnpm -C apps/demo exec vite build --base=/ && pnpm -C apps/demo-vue exec vite build --base=/vue/ && mkdir -p out/vue && cp -r apps/demo/dist/* out/ && cp -r apps/demo-vue/dist/* out/vue/` |
-| Build output directory | `out` |
-| 环境变量 `NODE_VERSION` | `22` |
+| `CLOUDFLARE_API_TOKEN` | API Token,模板 "Edit Cloudflare Workers" |
+| `CLOUDFLARE_ACCOUNT_ID` | 账号 ID,dashboard 右侧栏可复制 |
+
+本地手动部署:`pnpm exec wrangler deploy`(需 `CLOUDFLARE_API_TOKEN` 环境变量)。
 
 ## 项目状态
 
