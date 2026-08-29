@@ -2,6 +2,11 @@
 
 > 移动端富文本编辑器:话题(#)插入 + 图片/视频图文混排。基于 `contentEditable` + Selection/Range API 自研,框架无关 core + React / Vue 适配层。
 
+[![npm](https://img.shields.io/npm/v/@fe-muzi/rte-core?label=%40fe-muzi%2Frte-core)](https://www.npmjs.com/package/@fe-muzi/rte-core)
+[![npm](https://img.shields.io/npm/v/@fe-muzi/rte-react?label=%40fe-muzi%2Frte-react)](https://www.npmjs.com/package/@fe-muzi/rte-react)
+[![npm](https://img.shields.io/npm/v/@fe-muzi/rte-vue?label=%40fe-muzi%2Frte-vue)](https://www.npmjs.com/package/@fe-muzi/rte-vue)
+[![demo](https://img.shields.io/badge/demo-online-2762EC)](https://rich-text-editor.739371512.workers.dev/)
+
 从社区 App(`superapp-omp-web`)的 `RichTextarea` / `ArticleRichTextarea` 中提取核心能力,解耦 App 原生耦合,重构为可独立运行、可复用、可发布的 Monorepo。
 
 ## 核心能力
