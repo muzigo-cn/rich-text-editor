@@ -1,6 +1,6 @@
 # rich-text-editor
 
-> 移动端富文本编辑器:话题(#)插入 + 图片/视频图文混排。基于 `contentEditable` + Selection/Range API 自研,框架无关 core + React 适配层。
+> 移动端富文本编辑器:话题(#)插入 + 图片/视频图文混排。基于 `contentEditable` + Selection/Range API 自研,框架无关 core + React / Vue 适配层。
 
 从社区 App(`superapp-omp-web`)的 `RichTextarea` / `ArticleRichTextarea` 中提取核心能力,解耦 App 原生耦合,重构为可独立运行、可复用、可发布的 Monorepo。
 
@@ -17,9 +17,9 @@
 ## 技术栈
 
 - **核心**:`packages/core` —— 框架无关 vanilla TypeScript,基于 Selection/Range API
-- **适配层**:`packages/react` —— React 组件绑定 core(Vue 适配层列为二期)
-- **演示站**:`apps/demo` —— Vite + React
-- **构建**:tsup(core/react)、Vite(demo)
+- **适配层**:`packages/react` / `packages/vue` —— React 组件与 Vue 3 组件绑定 core
+- **演示站**:`apps/demo` —— Vite + React;`apps/demo-vue` —— Vite + Vue 3
+- **构建**:tsup(core/react/vue)、Vite(demo)
 - **包管理**:pnpm workspace
 
 ## 目录结构
@@ -43,18 +43,31 @@ rich-text-editor/
 │   │   ├── test/          # vitest 单元测试(纯函数 + DOM 判定)
 │   │   ├── styles/editor.css
 │   │   └── tsup.config.ts
-│   └── react/             # @rte/react —— React 适配层
+│   ├── react/             # @rte/react —— React 适配层
 │       ├── src/
 │       │   ├── RichTextEditor.tsx    # 组件:forwardRef 暴露命令式 API + 上传态 portal 渲染
 │       │   ├── useRichTextEditor.ts  # hook:实例创建/销毁,回调经 ref 转发
 │       │   ├── UploadStatus.tsx      # UploadLoading/UploadFailure 内置占位组件
 │       │   └── index.ts
 │       └── tsup.config.ts
-└── apps/
-    └── demo/              # 演示站(Vite)
+│   └── vue/               # @rte/vue —— Vue 3 适配层
+│       ├── src/
+│       │   ├── RichTextEditor.ts     # 组件:expose 命令式 API + 上传态 Teleport 渲染
+│       │   ├── useRichTextEditor.ts  # composable:实例创建/销毁,回调经 getter 转发
+│       │   ├── UploadStatus.ts       # UploadLoading/UploadFailure 内置占位组件
+│       │   └── index.ts
+│       └── tsup.config.ts
+├── apps/
+    ├── demo/              # React 演示站(Vite)
+    │   └── src/
+    │       ├── App.tsx
+    │       ├── TopicPicker.tsx
+    │       ├── WebMediaUploader.ts
+    │       └── demo.css
+    └── demo-vue/          # Vue 3 演示站(Vite + vue-tsc)
         └── src/
-            ├── App.tsx            # 话题面板 + Web 上传 + 字数/超长/HTML 输出演示
-            ├── TopicPicker.tsx    # 模拟话题面板(# 触发)
+            ├── App.vue            # 话题面板 + Web 上传 + 字数/超长/HTML 输出演示
+            ├── TopicPicker.vue    # 模拟话题面板(# 触发)
             ├── WebMediaUploader.ts# 模拟上传器(loading→success/failure)
             └── demo.css
 ├── docs/
@@ -69,6 +82,7 @@ rich-text-editor/
 ```bash
 pnpm install
 pnpm dev          # 启动 demo(Vite,默认 http://localhost:5173)
+pnpm -C apps/demo-vue dev   # 启动 Vue 演示站(http://localhost:5174)
 ```
 
 构建:
@@ -111,6 +125,7 @@ core 暴露 `createRichTextEditor(options)`,返回 `{ insertTopic, getHTML, getL
 - [x] **阶段 0**:Monorepo 脚手架(core/react/demo 三包,构建跑通)
 - [x] **阶段 1**:core 核心迁移(selection/length/topic/media 纯函数 + 事件流)
 - [x] **阶段 2**:React 适配层(useRichTextEditor hook + RichTextEditor 组件 + 上传态渲染)
+- [x] **阶段 2.5**:Vue 适配层(@rte/vue:useRichTextEditor composable + RichTextEditor 组件 + 上传态 Teleport 渲染)
 - [x] **阶段 3**:Demo 演示站(话题面板 + Web 上传,端到端演示)
 - [ ] **阶段 4**:打磨发布(包配置 + README 完善)
 

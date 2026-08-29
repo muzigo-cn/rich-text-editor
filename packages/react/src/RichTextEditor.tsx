@@ -88,7 +88,8 @@ export const RichTextEditor = forwardRef<RichTextEditorHandle, RichTextEditorPro
     }
     files.forEach((file) => {
       const localId = genLocalId()
-      editor.insertMedia([{ id: localId, type, status: 'loading', localIdentifier: localId }], type)
+      // 只传 id:core 以 localIdentifier+id 拼接生成节点标识,重复传会导致回刷时匹配不到节点
+      editor.insertMedia([{ id: localId, type, status: 'loading' }], type)
       uploader.upload(file, (status, url) => editor.setMediaStatus(localId, status, url))
     })
   }, [editorRef])

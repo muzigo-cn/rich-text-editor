@@ -9,6 +9,7 @@
     "build": "pnpm -r run build",
     "build:core": "pnpm -C packages/core build",
     "build:react": "pnpm -C packages/react build",
+    "build:vue": "pnpm -C packages/vue build",
     "typecheck": "pnpm -r run typecheck"
   },
   "engines": {
