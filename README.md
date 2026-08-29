@@ -77,6 +77,20 @@ rich-text-editor/
 └── package.json
 ```
 
+## 安装
+
+```bash
+pnpm add @rte/core          # 必装:框架无关内核(含编辑器样式)
+pnpm add @rte/react         # React 项目
+pnpm add @rte/vue           # Vue 3 项目(二选一)
+```
+
+样式需手动引入一次,主题 CSS 变量(`--rte-text-primary` / `--rte-text-disabled` / `--rte-text-link` 等)可在宿主覆盖:
+
+```ts
+import '@rte/core/styles/editor.css'
+```
+
 ## 快速开始
 
 ```bash
@@ -116,7 +130,121 @@ export interface EditorOptions {
 }
 ```
 
-core 暴露 `createRichTextEditor(options)`,返回 `{ insertTopic, getHTML, getLength, focus, destroy }`。
+core 暴露 `createRichTextEditor(options)`,返回 `{ insertTopic, insertMedia, setMediaStatus, removeMedia, getHTML, getPlain, getLength, focus, blur, destroy }`。
+
+## 使用示例
+
+### React
+
+```tsx
+import { useRef, useState } from 'react'
+import { RichTextEditor } from '@rte/react'
+import type { RichTextEditorHandle, TopicItem } from '@rte/react'
+import '@rte/core/styles/editor.css'
+
+const topics: TopicItem[] = [
+  { id: '1', title: '今日份下班搭子' },
+  { id: '2', title: '我的运动日常' },
+]
+
+function App() {
+  const editorRef = useRef<RichTextEditorHandle>(null)
+  const [html, setHtml] = useState('')
+  const [length, setLength] = useState(0)
+
+  return (
+    <>
+      <RichTextEditor
+        ref={editorRef}
+        maxLength={180}
+        placeholder={{ focus: '说点什么…', blur: '说点什么…' }}
+        onChange={(html, plain, length) => { setHtml(html); setLength(length) }}
+        onTopicTrigger={() => {/* 输入 # 触发,弹出话题面板 */}}
+        onMediaRequest={(type) => {/* 点击占位触发,弹出图片/视频选择 */}}
+        onLengthLimit={(isOver) => {/* 超长提示 */}}
+        mediaUploader={{
+          upload: (file, onStatus) => {
+            onStatus('loading')
+            // 调宿主上传接口,完成后回写:
+            // onStatus('success', url) 或 onStatus('failure')
+          },
+        }}
+      />
+      <button onClick={() => editorRef.current?.insertTopic(topics[0], 'tab')}>插入话题</button>
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={(e) => editorRef.current?.insertFiles(Array.from(e.target.files ?? []), 'image')}
+      />
+      <div dangerouslySetInnerHTML={{ __html: html }} />
+    </>
+  )
+}
+```
+
+命令式 API(`ref.current`):`insertTopic` / `insertMedia` / `insertFiles` / `setMediaStatus` / `removeMedia` / `getHTML` / `getPlain` / `getLength` / `focus` / `blur`。
+
+上传态 UI 可通过 `renderUploadStatus` 自定义,默认内置 `UploadLoading` / `UploadFailure` 组件(portal 到媒体节点内渲染)。
+
+### Vue 3
+
+```vue
+<script setup lang="ts">
+import { ref, useTemplateRef } from 'vue'
+import { RichTextEditor } from '@rte/vue'
+import type { RichTextEditorHandle, TopicItem } from '@rte/vue'
+import '@rte/core/styles/editor.css'
+
+const editorRef = useTemplateRef<RichTextEditorHandle>('editorRef')
+const html = ref('')
+const length = ref(0)
+
+const topics: TopicItem[] = [{ id: '1', title: '今日份下班搭子' }]
+</script>
+
+<template>
+  <RichTextEditor
+    ref="editorRef"
+    :max-length="180"
+    :placeholder="{ focus: '说点什么…', blur: '说点什么…' }"
+    :media-uploader="{ upload: (file, onStatus) => onStatus('loading') }"
+    @change="(h, plain, len) => { html = h; length = len }"
+    @topic-trigger="() => {}"
+  />
+  <button @click="editorRef?.insertTopic(topics[0], 'tab')">插入话题</button>
+  <div v-html="html" />
+</template>
+```
+
+`@rte/vue` 组件 props 与命令式 API 和 React 版完全对齐,上传态经 `Teleport` 渲染。
+
+### 框架无关 core(直接使用)
+
+```ts
+import { createRichTextEditor } from '@rte/core'
+import '@rte/core/styles/editor.css'
+
+const editor = createRichTextEditor({
+  root: document.getElementById('editor')!,
+  maxLength: 180,
+  onChange: (html, plain, length) => console.log(html, plain, length),
+  onTopicTrigger: () => {/* 弹话题面板 */},
+  platform: {
+    getOS: () => 'iOS',
+    previewMedia: (src) => {/* 打开预览 */},
+  },
+  mediaUploader: {
+    upload: (file, onStatus) => onStatus('loading'),
+  },
+})
+
+editor.insertTopic({ id: '1', title: '话题名' }, 'tab')
+editor.insertMedia([{ id: 'f1', type: 'image', status: 'loading' }], 'image')
+editor.setMediaStatus('f1', 'success', 'https://cdn.example.com/a.jpg')
+console.log(editor.getHTML(), editor.getLength())
+editor.destroy()
+```
 
 ## 在线演示
 
@@ -145,7 +273,7 @@ Cloudflare Workers 静态资产托管(GitHub Actions 构建,push main 自动部�
 - [x] **阶段 2**:React 适配层(useRichTextEditor hook + RichTextEditor 组件 + 上传态渲染)
 - [x] **阶段 2.5**:Vue 适配层(@rte/vue:useRichTextEditor composable + RichTextEditor 组件 + 上传态 Teleport 渲染)
 - [x] **阶段 3**:Demo 演示站(话题面板 + Web 上传,端到端演示)
-- [ ] **阶段 4**:打磨发布(包配置 + README 完善)
+- [x] **阶段 4**:打磨发布(包发布配置 exports/sideEffects/peerDeps + 安装/API 文档)
 
 完整方案见 [docs/提取计划.md](./docs/提取计划.md)。
 

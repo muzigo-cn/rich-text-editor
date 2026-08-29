@@ -1,6 +1,27 @@
 {
   "name": "@rte/vue",
   "version": "0.0.0",
+  "description": "@rte/core 的 Vue 3 适配层:组件绑定 + 命令式 API + 上传状态渲染",
+  "keywords": [
+    "rich-text-editor",
+    "vue",
+    "vue3",
+    "contenteditable",
+    "mobile",
+    "editor"
+  ],
+  "license": "MIT",
+  "author": "muzigo-cn",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muzigo-cn/rich-text-editor.git",
+    "directory": "packages/vue"
+  },
+  "bugs": {
+    "url": "https://github.com/muzigo-cn/rich-text-editor/issues"
+  },
+  "homepage": "https://github.com/muzigo-cn/rich-text-editor#readme",
+  "sideEffects": false,
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
