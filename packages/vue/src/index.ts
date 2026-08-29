@@ -4,7 +4,7 @@ export { useRichTextEditor } from './useRichTextEditor'
 export type { UseRichTextEditorOptions, UseRichTextEditorSource, UseRichTextEditorReturn } from './useRichTextEditor'
 export { UploadLoading, UploadFailure } from './UploadStatus'
 
-// 核心类型透出,宿主无需直接依赖 @rte/core 也可声明类型
+// 核心类型透出,宿主无需直接依赖 @fe-muzi/rte-core 也可声明类型
 export type {
   TopicItem,
   MediaFile,
@@ -14,4 +14,4 @@ export type {
   PlatformAdapter,
   MediaUploader,
   EditorOptions,
-} from '@rte/core'
+} from '@fe-muzi/rte-core'

@@ -1,4 +1,4 @@
-import type { TopicItem } from '@rte/react'
+import type { TopicItem } from '@fe-muzi/rte-react'
 
 const MOCK_TOPICS: TopicItem[] = [
   { id: 1, title: '今日份快乐' },

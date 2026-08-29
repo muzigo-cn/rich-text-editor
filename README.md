@@ -32,7 +32,7 @@
 ```
 rich-text-editor/
 ├── packages/
-│   ├── core/              # @rte/core —— 框架无关内核
+│   ├── core/              # @fe-muzi/rte-core —— 框架无关内核
 │   │   ├── src/
 │   │   │   ├── editor.ts      # createRichTextEditor:事件绑定与模块协调
 │   │   │   ├── event.ts       # handleDivChange 分发(删除/输入/IME/# 检测/样式治理)
@@ -48,14 +48,14 @@ rich-text-editor/
 │   │   ├── test/          # vitest 单元测试(纯函数 + DOM 判定)
 │   │   ├── styles/editor.css
 │   │   └── tsup.config.ts
-│   ├── react/             # @rte/react —— React 适配层
+│   ├── react/             # @fe-muzi/rte-react —— React 适配层
 │       ├── src/
 │       │   ├── RichTextEditor.tsx    # 组件:forwardRef 暴露命令式 API + 上传态 portal 渲染
 │       │   ├── useRichTextEditor.ts  # hook:实例创建/销毁,回调经 ref 转发
 │       │   ├── UploadStatus.tsx      # UploadLoading/UploadFailure 内置占位组件
 │       │   └── index.ts
 │       └── tsup.config.ts
-│   └── vue/               # @rte/vue —— Vue 3 适配层
+│   └── vue/               # @fe-muzi/rte-vue —— Vue 3 适配层
 │       ├── src/
 │       │   ├── RichTextEditor.ts     # 组件:expose 命令式 API + 上传态 Teleport 渲染
 │       │   ├── useRichTextEditor.ts  # composable:实例创建/销毁,回调经 getter 转发
@@ -85,15 +85,15 @@ rich-text-editor/
 ## 安装
 
 ```bash
-pnpm add @rte/core          # 必装:框架无关内核(含编辑器样式)
-pnpm add @rte/react         # React 项目
-pnpm add @rte/vue           # Vue 3 项目(二选一)
+pnpm add @fe-muzi/rte-core          # 必装:框架无关内核(含编辑器样式)
+pnpm add @fe-muzi/rte-react         # React 项目
+pnpm add @fe-muzi/rte-vue           # Vue 3 项目(二选一)
 ```
 
 样式需手动引入一次,主题 CSS 变量(`--rte-text-primary` / `--rte-text-disabled` / `--rte-text-link` 等)可在宿主覆盖:
 
 ```ts
-import '@rte/core/styles/editor.css'
+import '@fe-muzi/rte-core/styles/editor.css'
 ```
 
 ## 快速开始
@@ -107,12 +107,12 @@ pnpm -C apps/demo-vue dev   # 启动 Vue 演示站(http://localhost:5174)
 构建:
 
 ```bash
-pnpm build:core   # 构建 @rte/core(tsup 输出 ESM/CJS/d.ts)
-pnpm build:react  # 构建 @rte/react
+pnpm build:core   # 构建 @fe-muzi/rte-core(tsup 输出 ESM/CJS/d.ts)
+pnpm build:react  # 构建 @fe-muzi/rte-react
 pnpm -C apps/demo build
 ```
 
-> demo 的 `vite.config.ts` 用精确别名把 `@rte/core` / `@rte/react` 指向各自源码入口,因此 `pnpm dev` 无需先构建子包;`@rte/core/styles/*` 走包 `exports` 字段解析到真实 CSS 文件。
+> demo 的 `vite.config.ts` 用精确别名把 `@fe-muzi/rte-core` / `@fe-muzi/rte-react` 指向各自源码入口,因此 `pnpm dev` 无需先构建子包;`@fe-muzi/rte-core/styles/*` 走包 `exports` 字段解析到真实 CSS 文件。
 
 ## 核心抽象
 
@@ -143,9 +143,9 @@ core 暴露 `createRichTextEditor(options)`,返回 `{ insertTopic, insertMedia, 
 
 ```tsx
 import { useRef, useState } from 'react'
-import { RichTextEditor } from '@rte/react'
-import type { RichTextEditorHandle, TopicItem } from '@rte/react'
-import '@rte/core/styles/editor.css'
+import { RichTextEditor } from '@fe-muzi/rte-react'
+import type { RichTextEditorHandle, TopicItem } from '@fe-muzi/rte-react'
+import '@fe-muzi/rte-core/styles/editor.css'
 
 const topics: TopicItem[] = [
   { id: '1', title: '今日份下班搭子' },
@@ -197,9 +197,9 @@ function App() {
 ```vue
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import { RichTextEditor } from '@rte/vue'
-import type { RichTextEditorHandle, TopicItem } from '@rte/vue'
-import '@rte/core/styles/editor.css'
+import { RichTextEditor } from '@fe-muzi/rte-vue'
+import type { RichTextEditorHandle, TopicItem } from '@fe-muzi/rte-vue'
+import '@fe-muzi/rte-core/styles/editor.css'
 
 const editorRef = useTemplateRef<RichTextEditorHandle>('editorRef')
 const html = ref('')
@@ -222,13 +222,13 @@ const topics: TopicItem[] = [{ id: '1', title: '今日份下班搭子' }]
 </template>
 ```
 
-`@rte/vue` 组件 props 与命令式 API 和 React 版完全对齐,上传态经 `Teleport` 渲染。
+`@fe-muzi/rte-vue` 组件 props 与命令式 API 和 React 版完全对齐,上传态经 `Teleport` 渲染。
 
 ### 框架无关 core(直接使用)
 
 ```ts
-import { createRichTextEditor } from '@rte/core'
-import '@rte/core/styles/editor.css'
+import { createRichTextEditor } from '@fe-muzi/rte-core'
+import '@fe-muzi/rte-core/styles/editor.css'
 
 const editor = createRichTextEditor({
   root: document.getElementById('editor')!,

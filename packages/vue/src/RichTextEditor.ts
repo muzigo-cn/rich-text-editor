@@ -1,6 +1,6 @@
 import { defineComponent, h, shallowRef, Teleport } from 'vue'
 import type { PropType, StyleValue, VNode } from 'vue'
-import { createRichTextEditor } from '@rte/core'
+import { createRichTextEditor } from '@fe-muzi/rte-core'
 import type {
   EditorOptions,
   MediaFile,
@@ -11,7 +11,7 @@ import type {
   RichTextEditor as CoreRichTextEditor,
   TopicItem,
   UploadStatus,
-} from '@rte/core'
+} from '@fe-muzi/rte-core'
 import { useRichTextEditor } from './useRichTextEditor'
 import { UploadFailure, UploadLoading } from './UploadStatus'
 

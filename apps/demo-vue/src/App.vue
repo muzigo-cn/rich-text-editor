@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { detectOS } from '@rte/core'
-import { RichTextEditor } from '@rte/vue'
-import type { MediaType, RichTextEditorHandle, TopicItem } from '@rte/vue'
+import { detectOS } from '@fe-muzi/rte-core'
+import { RichTextEditor } from '@fe-muzi/rte-vue'
+import type { MediaType, RichTextEditorHandle, TopicItem } from '@fe-muzi/rte-vue'
 import TopicPicker from './TopicPicker.vue'
 import { createWebMediaUploader } from './WebMediaUploader'
 

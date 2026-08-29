@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { RefObject, MutableRefObject } from 'react'
-import { createRichTextEditor } from '@rte/core'
-import type { EditorOptions, RichTextEditor } from '@rte/core'
+import { createRichTextEditor } from '@fe-muzi/rte-core'
+import type { EditorOptions, RichTextEditor } from '@fe-muzi/rte-core'
 
 export type UseRichTextEditorOptions = Omit<EditorOptions, 'root'>
 

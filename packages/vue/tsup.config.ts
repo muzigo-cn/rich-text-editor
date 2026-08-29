@@ -6,5 +6,5 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
-  external: ['vue', '@rte/core'],
+  external: ['vue', '@fe-muzi/rte-core'],
 })

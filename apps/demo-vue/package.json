@@ -1,5 +1,5 @@
 {
-  "name": "@rte/demo-vue",
+  "name": "@fe-muzi/rte-demo-vue",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -10,8 +10,8 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@rte/core": "workspace:*",
-    "@rte/vue": "workspace:*",
+    "@fe-muzi/rte-core": "workspace:*",
+    "@fe-muzi/rte-vue": "workspace:*",
     "vue": "^3.4.0"
   },
   "devDependencies": {

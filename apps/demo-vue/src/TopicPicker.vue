@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TopicItem } from '@rte/vue'
+import type { TopicItem } from '@fe-muzi/rte-vue'
 
 defineProps<{ open: boolean }>()
 

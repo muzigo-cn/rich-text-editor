@@ -1,7 +1,7 @@
 {
-  "name": "@rte/react",
-  "version": "0.0.0",
-  "description": "@rte/core 的 React 适配层:组件绑定 + 命令式 API + 上传状态渲染",
+  "name": "@fe-muzi/rte-react",
+  "version": "0.1.0",
+  "description": "@fe-muzi/rte-core 的 React 适配层:组件绑定 + 命令式 API + 上传状态渲染",
   "keywords": [
     "rich-text-editor",
     "react",
@@ -44,7 +44,7 @@
     "react-dom": "^18.0.0"
   },
   "dependencies": {
-    "@rte/core": "workspace:*"
+    "@fe-muzi/rte-core": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

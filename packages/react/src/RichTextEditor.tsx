@@ -8,7 +8,7 @@ import type {
   RichTextEditor as CoreRichTextEditor,
   TopicItem,
   UploadStatus,
-} from '@rte/core'
+} from '@fe-muzi/rte-core'
 import { useRichTextEditor } from './useRichTextEditor'
 import { UploadFailure, UploadLoading } from './UploadStatus'
 

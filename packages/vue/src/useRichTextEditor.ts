@@ -1,7 +1,7 @@
 import { onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 import type { Ref } from 'vue'
-import { createRichTextEditor } from '@rte/core'
-import type { EditorOptions, RichTextEditor } from '@rte/core'
+import { createRichTextEditor } from '@fe-muzi/rte-core'
+import type { EditorOptions, RichTextEditor } from '@fe-muzi/rte-core'
 
 export type UseRichTextEditorOptions = Omit<EditorOptions, 'root'>
 

@@ -1,7 +1,7 @@
 {
-  "name": "@rte/vue",
-  "version": "0.0.0",
-  "description": "@rte/core 的 Vue 3 适配层:组件绑定 + 命令式 API + 上传状态渲染",
+  "name": "@fe-muzi/rte-vue",
+  "version": "0.1.0",
+  "description": "@fe-muzi/rte-core 的 Vue 3 适配层:组件绑定 + 命令式 API + 上传状态渲染",
   "keywords": [
     "rich-text-editor",
     "vue",
@@ -44,7 +44,7 @@
     "vue": "^3.3.0"
   },
   "dependencies": {
-    "@rte/core": "workspace:*"
+    "@fe-muzi/rte-core": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.0.0",

@@ -14,10 +14,10 @@ importers:
 
   apps/demo:
     dependencies:
-      '@rte/core':
+      '@fe-muzi/rte-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@rte/react':
+      '@fe-muzi/rte-react':
         specifier: workspace:*
         version: link:../../packages/react
       react:
@@ -45,10 +45,10 @@ importers:
 
   apps/demo-vue:
     dependencies:
-      '@rte/core':
+      '@fe-muzi/rte-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@rte/vue':
+      '@fe-muzi/rte-vue':
         specifier: workspace:*
         version: link:../../packages/vue
       vue:
@@ -85,7 +85,7 @@ importers:
 
   packages/react:
     dependencies:
-      '@rte/core':
+      '@fe-muzi/rte-core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -110,7 +110,7 @@ importers:
 
   packages/vue:
     dependencies:
-      '@rte/core':
+      '@fe-muzi/rte-core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

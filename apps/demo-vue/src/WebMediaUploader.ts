@@ -1,4 +1,4 @@
-import type { MediaUploader } from '@rte/vue'
+import type { MediaUploader } from '@fe-muzi/rte-vue'
 
 /**
  * Web 模拟上传器(对应原生 JSBridge 上传):

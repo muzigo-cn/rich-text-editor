@@ -1,5 +1,5 @@
 import { defineComponent, h } from 'vue'
-import type { MediaType } from '@rte/core'
+import type { MediaType } from '@fe-muzi/rte-core'
 
 /**
  * 上传中占位(对应 React 版 UploadLoading,样式见 core styles/editor.css)
